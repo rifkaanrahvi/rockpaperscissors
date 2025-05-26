@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPS CLASSIFIER // BRUTALIST EDITION</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #ffffff; /* Background Putih Murni */
+            --text-color: #1a1a1a; /* Teks Hitam Pekat */
+            --border-color: #000000; /* Border Hitam Murni */
+            --highlight-color: #008000; /* Hijau gelap untuk highlight, lebih kalem dari neon */
+            --error-color: #cc0000; /* Merah terang untuk error */
+            --element-bg: #e0e0e0; /* Background elemen abu-abu terang */
+        }
+
+        body {
+            font-family: 'Fira Mono', monospace;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            line-height: 1.4;
+        }
+
+        .container {
+            background-color: var(--bg-color); /* Tetap putih agar border lebih menonjol */
+            max-width: 700px;
+            width: 100%;
+            padding: 30px;
+            border: 3px solid var(--border-color);
+            box-shadow: 8px 8px 0px var(--border-color);
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Roboto Condensed', sans-serif;
+            color: var(--border-color); /* Hitam murni */
+            margin-bottom: 25px;
+            font-size: 2.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid var(--highlight-color); /* Garis bawah menonjol */
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        /* Grouping untuk sejajar */
+        .input-group {
+            display: flex; /* Menggunakan flexbox untuk sejajar */
+            justify-content: center; /* Pusatkan secara horizontal */
+            align-items: center; /* Sejajarkan secara vertikal */
+            margin-bottom: 20px;
+        }
+
+        /* Input File Styling */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: flex; /* Menggunakan flexbox di sini juga untuk tombol dan teks */
+            align-items: center;
+            border: 2px solid var(--border-color);
+            background-color: var(--element-bg);
+            box-shadow: 3px 3px 0px var(--border-color);
+            flex-grow: 1; /* Biarkan mengambil ruang yang tersedia */
+            max-width: 350px; /* Batasi lebar */
+            margin-right: 15px; /* Jarak dari tombol predict */
+        }
+
+        .file-input-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-input-button {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: var(--element-bg);
+            color: var(--text-color);
+            font-family: 'Fira Mono', monospace;
+            font-size: 1em;
+            text-transform: uppercase;
+            border: none;
+            border-right: 2px solid var(--border-color); /* Border kanan */
+            flex-shrink: 0; /* Jangan menyusut */
+        }
+
+        .file-input-button:hover {
+            background-color: var(--border-color);
+            color: var(--bg-color);
+        }
+
+        #fileNameDisplay {
+            padding: 10px;
+            background-color: var(--element-bg);
+            color: var(--highlight-color);
+            font-size: 0.9em;
+            flex-grow: 1; /* Biarkan mengambil sisa ruang */
+            text-align: left; /* Rata kiri */
+            white-space: nowrap; /* Jangan wrap */
+            overflow: hidden; /* Sembunyikan jika terlalu panjang */
+            text-overflow: ellipsis; /* Tambahkan elipsis jika disembunyikan */
+        }
+
+        /* Tombol Predict */
+        button#predictButton {
+            padding: 12px 25px;
+            background-color: var(--border-color);
+            color: var(--bg-color);
+            border: 2px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--highlight-color);
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: all 0.1s ease-in-out;
+            outline: none;
+        }
+
+        button#predictButton:hover {
+            background-color: var(--bg-color);
+            color: var(--border-color);
+            box-shadow: 0px 0px 0px var(--highlight-color);
+            transform: translate(4px, 4px);
+        }
+
+        button:disabled {
+            background-color: #666666;
+            color: #aaaaaa;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            height: auto;
+            margin-top: 30px;
+            border: 3px solid var(--border-color);
+            box-shadow: 5px 5px 0px var(--highlight-color);
+            display: none;
+        }
+
+        #predictionResult {
+            margin-top: 40px;
+            padding: 25px;
+            border: 3px solid var(--border-color);
+            background-color: var(--element-bg); /* Background abu-abu terang */
+            box-shadow: 6px 6px 0px var(--border-color);
+            display: none;
+            text-align: left;
+        }
+
+        #predictionResult h3 {
+            color: var(--border-color);
+            margin-top: 0;
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 1.8em;
+            text-transform: uppercase;
+            border-bottom: 1px dashed var(--highlight-color);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        #predictedClass {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--highlight-color);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        #probabilities {
+            background-color: var(--bg-color); /* Background putih */
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9em;
+            color: var(--text-color);
+        }
+
+        #errorMessage {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: var(--error-color);
+            border: 2px solid var(--border-color);
+            color: var(--bg-color); /* Teks putih */
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 4px 4px 0px var(--border-color);
+            display: none;
+        }
+
+        /* Loading Indicator */
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-left-color: transparent;
+            border-radius: 0;
+            animation: spin-brutal 0.8s linear infinite;
+            display: none;
+            margin: 30px auto;
+        }
+
+        @keyframes spin-brutal {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Untuk Mobile */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+                border: 2px solid var(--border-color);
+                box-shadow: 4px 4px 0px var(--border-color);
+            }
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 15px;
+            }
+            p {
+                font-size: 0.9em;
+            }
+            .input-group {
+                flex-direction: column; /* Ubah ke kolom di mobile */
+                align-items: stretch; /* Regangkan item */
+            }
+            .file-input-wrapper {
+                width: 100%;
+                max-width: none; /* Hilangkan batasan lebar */
+                margin-right: 0;
+                margin-bottom: 15px; /* Jarak antar elemen input-group */
+            }
+            button#predictButton {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 0; /* Sudah ada margin-bottom di wrapper */
+            }
+            #fileNameDisplay {
+                display: block;
+                border-top: 2px solid var(--border-color);
+                border-left: none; /* Hapus border kiri di mobile */
+            }
+            #predictionResult {
+                padding: 15px;
+                border: 2px solid var(--border-color);
+                box-shadow: 4px 4px 0px var(--border-color);
+            }
+            #predictedClass {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RPS CLASSIFIER</h1>
+        <p>UPLOAD IMAGE OF HAND</p>
+
+        <div class="input-group">
+            <div class="file-input-wrapper">
+                <input type="file" id="imageUpload" accept="image/*">
+                <button class="file-input-button">CHOOSE FILE</button>
+                <span id="fileNameDisplay">NO FILE CHOSEN</span>
+            </div>
+            <button id="predictButton" onclick="uploadImage()">PREDICT</button>
+        </div>
+
+        <div class="loader" id="loader"></div>
+
+        <img id="imagePreview" src="#" alt="IMAGE PREVIEW">
+
+        <div id="predictionResult">
+            <h3>PREDICTION RESULT:</h3>
+            <p id="predictedClass"></p>
+            <h3>PROBABILITIES:</h3>
+            <pre id="probabilities"></pre>
+        </div>
+        <p id="errorMessage" style="color: red; display: none;"></p>
+    </div>
+
+    <script>
+        const imageUpload = document.getElementById('imageUpload');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const predictButton = document.getElementById('predictButton');
+        const loader = document.getElementById('loader');
+        const imagePreview = document.getElementById('imagePreview');
+        const predictionResult = document.getElementById('predictionResult');
+        const predictedClass = document.getElementById('predictedClass');
+        const probabilities = document.getElementById('probabilities');
+        const errorMessage = document.getElementById('errorMessage');
+    
+        // Fungsi untuk mendapatkan emoji berdasarkan kelas
+        function getEmoji(className) {
+            switch(className.toLowerCase()) {
+                case 'paper':
+                    return '🖐️'; // Emoji tangan terbuka
+                case 'rock':
+                    return '✊'; // Emoji tinju
+                case 'scissors':
+                    return '✌️'; // Emoji jari V (peace/scissors)
+                default:
+                    return '❓'; // Emoji tanda tanya jika tidak dikenal
+            }
+        }
+    
+        imageUpload.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                fileNameDisplay.textContent = this.files[0].name.toUpperCase();
+            } else {
+                fileNameDisplay.textContent = 'NO FILE CHOSEN';
+            }
+        });
+    
+        async function uploadImage() {
+            errorMessage.style.display = 'none';
+            predictionResult.style.display = 'none';
+            imagePreview.style.display = 'none';
+            imagePreview.src = '#';
+    
+            const file = imageUpload.files[0];
+    
+            if (!file) {
+                errorMessage.textContent = "PLEASE SELECT AN IMAGE FILE.";
+                errorMessage.style.display = 'block';
+                return;
+            }
+    
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+    
+            loader.style.display = 'block';
+            predictButton.disabled = true;
+            imageUpload.disabled = true;
+            document.querySelector('.file-input-button').disabled = true;
+    
+    
+            const formData = new FormData();
+            formData.append('file', file);
+    
+            try {
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+    
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP ERROR! STATUS: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                const predictedClassName = data.predicted_class.toUpperCase();
+                const emoji = getEmoji(data.predicted_class); // Dapatkan emoji
+                
+                predictedClass.innerHTML = `${emoji} ${predictedClassName}`; // Tampilkan emoji + teks
+                probabilities.textContent = JSON.stringify(data.probabilities, null, 2).toUpperCase();
+                predictionResult.style.display = 'block';
+    
+            } catch (error) {
+                console.error('ERROR DURING PREDICTION:', error);
+                errorMessage.textContent = `PREDICTION FAILED: ${error.message.toUpperCase()}`;
+                errorMessage.style.display = 'block';
+            } finally {
+                loader.style.display = 'none';
+                predictButton.disabled = false;
+                imageUpload.disabled = false;
+                document.querySelector('.file-input-button').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
