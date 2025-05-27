@@ -1,0 +1,2 @@
+Aplikasi Web Klasifikasi Gambar Rock Paper Scissors
+Aplikasi web sederhana berbasis Flask yang digunakan untuk mengklasifikasikan gambar tangan ke dalam tiga kategori: Rock (batu), Paper (kertas), dan Scissors (gunting). Aplikasi ini menggunakan model Convolutional Neural Network (CNN) yang telah dilatih sebelumnya untuk mengenali jenis gerakan tangan dari gambar input yang diberikan oleh pengguna. Model yang digunakan disimpan dalam format .h5 pada path model_checkpoints/best_model.weights.h5.
