@@ -39,9 +39,17 @@ Model klasifikasi disimpan dalam format `.h5` dan dapat mengenali jenis gerakan 
 
 ---
 
-## ⚙️ Panduan Instalasi & Menjalankan Aplikasi
+👨‍💻 Tim Pengembang
+Rifka Anrahvi
 
-1. **Clone repositori ini**
-```bash
-git clone https://github.com/usernamekamu/rock-paper-scissors-flask.git
-cd rock-paper-scissors-flask
+Irma Fitriani
+
+Rahma Devi
+
+Intan Adha Maharani
+
+Stevani
+
+
+
+
