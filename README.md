@@ -40,6 +40,7 @@ Model klasifikasi disimpan dalam format `.h5` dan dapat mengenali jenis gerakan 
 ---
 
 👨‍💻 Tim Pengembang
+
 Rifka Anrahvi
 
 Irma Fitriani
